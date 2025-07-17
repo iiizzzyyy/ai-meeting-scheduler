@@ -11,7 +11,7 @@
     "DATABASE_URL": "postgresql://placeholder",
     "DIRECT_URL": "postgresql://placeholder",
     "OPENAI_API_KEY": "placeholder-openai-key",
-    "NEXTAUTH_URL": "@vercel-url",
+    "NEXTAUTH_URL": "https://placeholder.vercel.app",
     "NEXTAUTH_SECRET": "placeholder-secret",
     "HOLIDAY_API_URL": "https://date.nager.at/api/v3"
   }
