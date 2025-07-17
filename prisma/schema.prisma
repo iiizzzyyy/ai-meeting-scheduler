@@ -1,0 +1,127 @@
+// This is your Prisma schema file
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  meetings      Meeting[]
+  schedulingRules SchedulingRule[]
+  availabilities Availability[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Meeting {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  startTime     DateTime
+  endTime       DateTime
+  duration      Int       // in minutes
+  attendeeEmail String
+  attendeeName  String?
+  status        String    @default("scheduled") // scheduled, cancelled, completed
+  
+  // External calendar integration
+  googleEventId String?
+  outlookEventId String?
+  
+  // Owner relationship
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Metadata
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@index([userId])
+  @@index([startTime])
+}
+
+model SchedulingRule {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  type        String    // weekdays, business_hours, buffer_time, max_meetings_per_day, etc.
+  config      Json      // flexible configuration object
+  isActive    Boolean   @default(true)
+  priority    Int       @default(0)
+  
+  // Owner relationship
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@index([userId])
+}
+
+model Availability {
+  id        String    @id @default(cuid())
+  dayOfWeek Int       // 0 = Sunday, 1 = Monday, etc.
+  startTime String    // HH:MM format
+  endTime   String    // HH:MM format
+  timezone  String    @default("UTC")
+  
+  // Owner relationship
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Metadata
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  @@index([userId])
+}
