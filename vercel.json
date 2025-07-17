@@ -1,0 +1,18 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "outputDirectory": ".next",
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://placeholder.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "placeholder-anon-key",
+    "SUPABASE_SERVICE_ROLE_KEY": "placeholder-service-role-key",
+    "DATABASE_URL": "postgresql://placeholder",
+    "DIRECT_URL": "postgresql://placeholder",
+    "OPENAI_API_KEY": "placeholder-openai-key",
+    "NEXTAUTH_URL": "@vercel-url",
+    "NEXTAUTH_SECRET": "placeholder-secret",
+    "HOLIDAY_API_URL": "https://date.nager.at/api/v3"
+  }
+}
