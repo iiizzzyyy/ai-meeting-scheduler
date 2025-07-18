@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/client'
 
 // Microsoft Graph OAuth configuration
 const MICROSOFT_CLIENT_ID = process.env.MICROSOFT_CLIENT_ID
@@ -42,8 +42,8 @@ export async function GET(request: NextRequest) {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        client_id: MICROSOFT_CLIENT_ID!,
-        client_secret: MICROSOFT_CLIENT_SECRET!,
+        client_id: MICROSOFT_CLIENT_ID || '',
+        client_secret: MICROSOFT_CLIENT_SECRET || '',
         code: code,
         grant_type: 'authorization_code',
         redirect_uri: MICROSOFT_REDIRECT_URI,
@@ -78,13 +78,16 @@ export async function GET(request: NextRequest) {
     // Save connection to database
     const supabase = createClient()
     
+    const accessToken = tokens.access_token || ''
+    const refreshToken = tokens.refresh_token || ''
+
     const { error: dbError } = await supabase
       .from('calendar_connections')
       .upsert({
         user_id: userId,
         provider_name: 'outlook',
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
+        access_token: accessToken,
+        refresh_token: refreshToken,
         token_expires_at: tokens.expires_in ? new Date(Date.now() + tokens.expires_in * 1000) : null,
         calendar_id: calendar.id,
         calendar_name: calendar.name || 'Outlook Calendar',
